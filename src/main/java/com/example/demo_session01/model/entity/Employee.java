@@ -1,4 +1,4 @@
-package com.example.demo_session01.entity;
+package com.example.demo_session01.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -20,7 +20,6 @@ public class Employee {
     @Column(unique = true, nullable = false)
     private String ma;
 
-    @NotBlank (message = "Vui lòng nhập tên nhân viên")
     @Column(nullable = false)
     private String ten;
 

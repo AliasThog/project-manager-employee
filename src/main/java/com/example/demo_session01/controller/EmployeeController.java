@@ -1,16 +1,17 @@
 package com.example.demo_session01.controller;
 
 
-import com.example.demo_session01.entity.Employee;
+import com.example.demo_session01.model.dto.request.CreateEmployeeDto;
+import com.example.demo_session01.model.dto.CustomResponse;
+import com.example.demo_session01.model.dto.request.UpdateEmployeeDto;
+import com.example.demo_session01.model.entity.Employee;
 import com.example.demo_session01.service.EmployeeService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/employees")
@@ -26,26 +27,20 @@ public class EmployeeController {
     public ResponseEntity<List<Employee>> getAllEmployees() {
         return ResponseEntity.ok().body(employeeService.getAllEmployees());
     }
+
     @GetMapping("/{id123}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable(name = "id123") Long id) {
         return ResponseEntity.ok().body(employeeService.getEmployeeById(id));
     }
 
     @PostMapping()
-    public ResponseEntity<?> createEmployee(@Valid @RequestBody Employee employee, BindingResult result) {
-        if(result.hasErrors()){
-            List<String> errors = result.getFieldErrors().stream()
-                    .map(error -> error.getDefaultMessage())
-                    .collect(Collectors.toList());
-            return ResponseEntity.badRequest().body(errors);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(employee));
+    public ResponseEntity<CustomResponse> createEmployee(@Valid @RequestBody CreateEmployeeDto dto, BindingResult result) {
+        return employeeService.createEmployee(dto, result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employeeDetails) {
-        Employee updatedEmployee = employeeService.updateEmployee(id, employeeDetails);
-        return ResponseEntity.ok().body(updatedEmployee);
+    public ResponseEntity<CustomResponse> updateEmployee(@PathVariable Long id, @RequestBody UpdateEmployeeDto dto, BindingResult result) {
+        return employeeService.updateEmployee(id, dto, result);
     }
 
     @DeleteMapping("/{id}")
