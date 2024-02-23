@@ -3,11 +3,14 @@ package com.example.demo_session01.controller;
 
 import com.example.demo_session01.entity.Employee;
 import com.example.demo_session01.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/employees")
@@ -29,7 +32,13 @@ public class EmployeeController {
     }
 
     @PostMapping()
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<?> createEmployee(@Valid @RequestBody Employee employee, BindingResult result) {
+        if(result.hasErrors()){
+            List<String> errors = result.getFieldErrors().stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errors);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(employee));
     }
 

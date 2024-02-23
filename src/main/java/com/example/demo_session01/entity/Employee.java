@@ -1,13 +1,14 @@
 package com.example.demo_session01.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "employees")
-    @Data
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employee {
@@ -16,9 +17,10 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String ma;
 
+    @NotBlank (message = "Vui lòng nhập tên nhân viên")
     @Column(nullable = false)
     private String ten;
 

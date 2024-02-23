@@ -12,6 +12,8 @@ import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+
+
     private final EmployeeRepository employeeRepository;
 
     public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
@@ -31,15 +33,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee createEmployee(Employee employee) {
+        if (employeeRepository.findByMa(employee.getMa()) != null) {
+            throw new CustomException("Ma nhan vien da ton tai", HttpStatus.CONFLICT);
+        }
         return employeeRepository.save(employee);
     }
 
     @Override
     public Employee updateEmployee(Long id, Employee employeeDetails) {
-
         Optional<Employee> employee = employeeRepository.findById(id);
         if (!employee.isPresent()) {
             throw new CustomException("ko tim thay nhan vien voi id " + id, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (!employee.get().getMa().equals(employeeDetails.getMa())) {
+            throw new CustomException("Không được thay đổi mã nhân viên", HttpStatus.BAD_REQUEST);
         }
         Employee updatedEmployee = employee.get();
         updatedEmployee.setMa(employeeDetails.getMa());
@@ -53,7 +60,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void deleteEmployee(Long id) {
-        employeeRepository.findById(id).ifPresent(employee -> employeeRepository.delete(employee));
+        employeeRepository.findById(id).ifPresentOrElse(employee ->{
+            employeeRepository.delete(employee);
+        },()->{
+            throw new CustomException("Không tìm thấy nhân viên",HttpStatus.NOT_FOUND);
+        });
+
     }
 }
 
